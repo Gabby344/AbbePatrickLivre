@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Livre d'Or - Abbé Patrick Muswankeng - Paroisse Anuarite</title>
+
+    <meta property="og:title" content="Témoignages de Reconnaissance - Abbé Patrick Muswankeng" />
+    <meta property="og:description" content="Exprimez votre gratitude et vos prières envers notre Curé pour son ministère à la Paroisse Bienheureuse Anuarite." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://gabby344.github.io/" />
+    <meta property="og:image" content="photo_abbe_1.JPG" /> <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore-compat.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.js"></script>
+
+    <script>
+        // CONFIGURATION TAILWIND (Couleurs solennelles : Bleu Marine et Or)
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-navy': '#002D62',      /* Bleu Marine Solennel */
+                        'accent-gold': '#FFD700',       /* Or/Jaune Accent */
+                        'bg-paper': '#fdfdfd',          /* Fond blanc/clair */
+                    },
+                    fontFamily: {
+                        'serif': ['Merriweather', 'serif'],
+                        'display': ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* VARIABLES CSS MISES À JOUR */
+        :root {
+            --primary-color: #002D62; /* Bleu Marine */
+            --accent-color: #FFD700; /* Or/Jaune */
+            --fond: #fdfdfd;
+            --fond-secondaire: #f0f4f7;
+            --texte: #3c3c3c;
+        }
+
+        body {
+            font-family: theme('fontFamily.serif');
+            background: linear-gradient(135deg, var(--fond), var(--fond-secondaire));
+            color: var(--texte);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            flex-grow: 1;
+        }
+
+        /* 1. Cache l'ensemble du contenu de la page au départ */
+        .hidden-content {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease-in-out;
+            pointer-events: none; /* Empêche les clics fantômes */
+        }
+        .visible-content {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        
+        /* --- NOUVEAUX STYLES POUR L'ANIMATION LIVRE D'OR --- */
+
+        /* 2. CONTENEUR PRINCIPAL (Plein écran, centrage et perspective 3D) */
+        .book-container {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--fond); 
+            z-index: 9999; 
+            perspective: 1500px;
+            overflow: hidden;
+            transition: opacity 1s 2s ease-out, visibility 1s 2s ease-out; 
+        }
+        .book-container.hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* 3. LE LIVRE (Positionnement et styles de base) */
+        .book {
+            width: 300px;
+            height: 450px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(10deg);
+        }
+
+        /* 4. LA COUVERTURE AVANT (Côté animé) */
+        .front, .back, .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 5px;
+            transform-origin: left center; /* Point de rotation */
+            transition: transform 2s ease-in-out, box-shadow 2s ease-in-out;
+        }
+
+        .front {
+            background-color: var(--primary-color);
+            color: white;
+            z-index: 10;
+            box-shadow: 10px 10px 40px rgba(0, 0, 0, 0.5);
+            border-right: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Contenu de la Couverture */
+        .cover-content {
+            padding: 30px;
+            text-align: center;
+        }
+        .cover-photo {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 5px solid var(--accent-color); 
+            margin: 20px auto 15px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+        }
+        .book-title {
+            font-family: theme('fontFamily.display');
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            color: var(--accent-color);
+        }
+        .book-subtitle {
+            font-size: 1.1rem;
+            font-family: theme('fontFamily.serif');
+            font-style: italic;
+            font-weight: 300;
+            margin-bottom: 15px;
+        }
+        .book-cross {
+            font-size: 3rem;
+            color: var(--accent-color);
+            font-family: 'Times New Roman', serif;
+        }
+
+        /* 5. LE DOS DU LIVRE */
+        .back {
+            background-color: var(--primary-color);
+            z-index: 5;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 6. LA PREMIÈRE PAGE INTÉRIEURE */
+        .page {
+            background-color: #ffffff;
+            z-index: 8; 
+            transform: rotateY(0deg);
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 7. L'ANIMATION D'OUVERTURE */
+        .book.open .front {
+            transform: rotateY(-180deg);
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+        }
+        .book.open .page {
+            transform: rotateY(-175deg);
+            transition-delay: 0.1s;
+        }
+        
+        /* --- STYLES ADAPTÉS À LA NOUVELLE PALETTE (DU CODE PRÉCÉDENT) --- */
+        .hero { position: relative; max-height: 550px; width: 100%; border-radius: 15px; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4); margin-top: 30px; overflow: hidden; border: 5px solid white; }
+        .carousel { display: flex; width: 400%; max-height: 550px; } /* Adapté à 3 images + 1 clone */
+        .carousel-item { width: calc(100% / 4); flex-shrink: 0; }
+        .hero-img { width: 100%; height: 550px; object-fit: cover; filter: brightness(70%); transition: filter 0.5s ease; }
+        .hero-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; text-align: center; font-family: theme('fontFamily.display'); background: rgba(0, 45, 98, 0.4); padding: 30px 60px; border-radius: 20px; backdrop-filter: blur(10px); z-index: 10; border: 2px solid rgba(255, 255, 255, 0.6); text-shadow: 1px 1px 3px rgba(0, 0, 0, 1); box-shadow: 0 0 40px rgba(0,0,0,0.6); }
+        .hero-text h1 { font-size: 60px; margin-bottom: 5px; color: #fff; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; }
+        .hero-text p { font-size: 32px; font-family: theme('fontFamily.serif'); color: #f0f8ff; line-height: 1.3; }
+        @media (max-width: 600px) { .hero-text { padding: 15px 10px; width: 90%; } .hero-text h1 { font-size: 30px !important; margin-bottom: 5px; } .hero-text p { font-size: 24px !important; } .hero-img { height: 400px; } }
+
+        h1:not(.hero-text h1) { color: var(--primary-color); font-family: theme('fontFamily.display'); letter-spacing: 3px; text-shadow: 2px 3px 5px rgba(0,0,0,0.1); font-weight: 700; }
+        form { margin: 60px auto; max-width: 650px; background: #ffffff; padding: 45px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); text-align: left; border-top: 6px solid var(--primary-color); transition: all 0.4s ease; }
+        form:hover { transform: translateY(-3px); box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15); }
+        label { font-weight: 700; color: var(--primary-color); display: block; margin-bottom: 8px; letter-spacing: 1px; font-size: 1.2em; font-family: theme('fontFamily.display'); }
+        input, textarea { width: 100%; padding: 18px; margin: 0 0 30px 0; border-radius: 12px; border: 1px solid #ccc; font-size: 1.2em; background-color: #f9f9f9; transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s; resize: vertical; }
+        input#name { font-size: 1.3em; font-weight: 600; color: #333; }
+        input:focus, textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(0, 45, 98, 0.2); background-color: #ffffff; }
+        #testimonialForm button[type="submit"] { width: 100%; padding: 18px 35px; background: linear-gradient(135deg, var(--primary-color), #0047AB); font-size: 1.4em; color: white; border-radius: 10px; font-weight: 900; box-shadow: 0 10px 25px rgba(0, 45, 98, 0.7); letter-spacing: 2px; text-transform: uppercase; transition: all 0.3s ease; }
+        #testimonialForm button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(0, 45, 98, 0.9); background: linear-gradient(135deg, #0047AB, var(--primary-color)); }
+        .book-button { background-color: var(--primary-color); background-image: linear-gradient(45deg, var(--primary-color) 40%, #0047AB 100%); @apply inline-flex items-center justify-center px-12 py-5 mt-16 mb-24 text-2xl font-extrabold text-white rounded-full transition-all duration-400 ease-out; box-shadow: 0 15px 40px rgba(0, 45, 98, 0.6); letter-spacing: 2px; text-transform: uppercase; }
+        .book-button:hover { transform: scale(1.05) translateY(-3px); box-shadow: 0 20px 50px rgba(0, 45, 98, 0.8); }
+        .w-24.bg-secondary-pink\/50 { background-color: rgba(255, 215, 0, 0.5); } 
+        .border-secondary-pink\/30 { border-color: rgba(255, 215, 0, 0.3); }
+        .border-secondary-pink\/50 { border-color: rgba(255, 215, 0, 0.5); }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 100; }
+        .modal-overlay.open { display: flex; }
+        .modal-content { background: #ffffff; padding: 40px; border-radius: 15px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4); animation: modalIn 0.3s ease-out; }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        .modal-button-link { display: block; margin-top: 20px; padding: 12px 25px; background: linear-gradient(135deg, var(--primary-color), #0047AB); color: white; font-weight: bold; border-radius: 50px; transition: all 0.3s; text-decoration: none; }
+        .modal-button-link:hover { transform: scale(1.03); box-shadow: 0 5px 15px rgba(0, 45, 98, 0.5); }
+        footer { padding: 20px 0; margin-top: 40px; border-top: 1px solid #f0e6e8; font-size: 0.9em; font-family: theme('fontFamily.serif'); text-align: center; color: #707070; width: 100%; }
+        footer .signature { font-weight: 700; color: var(--primary-color); font-family: theme('fontFamily.display'); }
+        .modal-content svg { color: var(--primary-color); }
+    </style>
+</head>
+
+<body>
+    <audio id="backgroundMusic" loop muted>
+        <source src="hymne_solennel.mp3" type="audio/mp3"> 
+    </audio>
+
+    <div id="bookCoverAnimation" class="book-container">
+        <div class="book">
+            <div class="back"></div>
+            <div class="page"></div>
+            <div class="front">
+                <div class="cover-content">
+                    <img src="photo_abbe_1.JPG" alt="Abbé Patrick Muswankeng" class="cover-photo">
+                    <h2 class="book-title">Livre d'Or</h2>
+                    <p class="book-subtitle">Hommage à l'Abbé Patrick Muswankeng</p>
+                    <div class="book-cross">☧</div> 
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="mainContent" class="hidden-content flex flex-col min-h-screen">
+        <main class="flex-grow">
+            
+            <section class="hero">
+                <div class="carousel" id="heroCarousel">
+                    <div class="carousel-item"><img src="photo_abbe_1.JPG" alt="Abbé Patrick Muswankeng - Photo 1" class="hero-img"></div>
+                    <div class="carousel-item"><img src="paroisse_anuarite.jpg" alt="Paroisse Bienheureuse Anuarite" class="hero-img"></div>
+                    <div class="carousel-item"><img src="photo_abbe_2.JPG" alt="Abbé Patrick Muswankeng - Photo 2" class="hero-img"></div>
+                    <div class="carousel-item" id="firstClone"><img src="photo_abbe_1.JPG" alt="Abbé Patrick Muswankeng - Photo 1" class="hero-img"></div>
+                </div>
+                
+                <div class="hero-text">
+                    <h1>🕊️ Livre d'Or Virtuel</h1>
+                    <p>« Au service de Dieu et des Hommes. Curé de la Paroisse Bienheureuse Anuarite Nengapeta. »</p>
+                </div>
+            </section>
+
+            <h1 class="text-5xl lg:text-6xl text-center mt-20 mb-3 font-display font-extrabold tracking-widest leading-tight text-primary-navy">
+                <span class="text-6xl mr-2 text-accent-gold">🙏</span> Témoignages de Reconnaissance
+            </h1>
+            <p class="text-xl max-w-3xl mx-auto font-serif text-gray-700 leading-relaxed mb-12">
+                Cher(ère) paroissien(ne) et ami(e), laissez un message de **gratitude**, un **souvenir marquant** ou une **prière** à notre Curé, l'Abbé Patrick Muswankeng.
+            </p>
+
+            <div class="w-24 h-1 mx-auto mb-16 rounded-full bg-accent-gold/50"></div>
+            
+            <form id="testimonialForm">
+                <label for="name">Votre Nom, Prénom et Qualité :</label>
+                <input type="text" id="name" placeholder="Ex : Famille Kabongo - Paroissiens de Anuarite" required aria-label="Votre nom, prénom et qualité" />
+                
+                <label for="message">Votre message de gratitude, souvenir ou prière :</label>
+                <textarea id="message" rows="6" placeholder="Ex : Cher Abbé, merci pour la profondeur de vos homélies et votre accompagnement pastoral. Que Dieu vous bénisse dans votre ministère. Un souvenir qui m'a marqué est..." required aria-label="Votre message"></textarea>
+                
+                <div id="errorMessage" class="text-red-600 text-lg mb-4 text-center font-bold" role="alert" style="display: none;"></div>
+
+                <button type="submit">✨ Soumettre mon Témoignage</button>
+            </form>
+
+            <div>
+                <a href="livre.html" class="book-button">
+                    <svg class="w-8 h-8 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.5l8 4.5v8l-8 4.5-8-4.5v-8l8-4.5zM12 6.5v11.5M4 11l8 4.5 8-4.5M4 11v8M20 11v8"></path></svg>
+                    Feuilleter le Livre des Messages
+                </a>
+            </div>
+            
+            <h2 class="text-4xl font-display text-primary-navy mt-24 mb-6 font-bold">Paroisse Bienheureuse Anuarite Nengapeta</h2>
+            
+            <div class="max-w-xl mx-auto bg-white p-8 sm:p-10 rounded-3xl shadow-2xl border-2 border-accent-gold/30 mb-20 transform hover:scale-[1.02] transition duration-300 ease-in-out">
+                
+                <h3 class="text-3xl font-display font-semibold text-gray-800 mb-6 pb-3 border-b-2 border-accent-gold/50 text-center">
+                    Contact & Informations
+                </h3>
+                
+                <div class="flex flex-col sm:flex-row items-center justify-center mb-8 text-xl sm:text-2xl font-serif">
+                    <div class="flex-shrink-0 mb-3 sm:mb-0 sm:mr-6 w-10 h-10 flex items-center justify-center rounded-full bg-green-100 p-1">
+                        <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12.047 2.051C6.586 2.051 2 6.637 2 12.09c0 2.227.727 4.309 1.988 6.046L2.012 22l4.4-1.157c1.693.924 3.655 1.408 5.635 1.408h.005c5.461 0 9.947-4.586 9.947-10.039C22 6.637 17.514 2.051 12.047 2.051zm3.64 12.235c-.198.336-.937.712-1.396.954-.458.24-.985.358-1.512.158-.707-.266-2.091-.84-2.85-2.222-.557-1.025-.87-1.928-.31-2.946.56-1.018 1.832-1.259 2.154-1.259.322 0 .524.015.703.015.006 0 .005.005.005.005 0 .015.005.015.005.015l.39.87c.054.12.023.238-.061.378-.083.14-.543.68-.74.918-.198.24-.413.398-.24.735.174.336.757 1.259 1.62 1.928.865.67 1.636.953 2.083.84.45-.113.714-.462.83-.655.118-.193.208-.415.3-.61.082-.186.27-.22.42-.162.15.058 1.05.514 1.23.63.174.113.29.17.336.254.045.083.045.513-.497 1.037z"/></svg>
+                    </div>
+                    
+                    <p class="text-center sm:text-left">
+                        <span class="font-bold text-primary-navy block sm:inline">Secrétariat :</span> 
+                        <a href="https://wa.me/243997227819" target="_blank" rel="noopener noreferrer" class="font-bold text-green-600 hover:text-green-800 transition-colors block sm:inline">
+                            +243 99 72 27 819 (Kolwezi)
+                        </a>
+                    </p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-center justify-center text-xl sm:text-2xl font-serif">
+                    <div class="flex-shrink-0 mb-3 sm:mb-0 sm:mr-6 w-10 h-10 flex items-center justify-center rounded-full bg-primary-navy/10 p-1">
+                        <svg class="w-8 h-8 text-primary-navy" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 12.713l-10.04 4.887c.054.012.112.019.17.019h19.68c.058 0 .116-.007.17-.019L12 12.713zm0-1.426l9.96-5.467c-.053-.017-.107-.03-.16-.03h-19.6c-.053 0-.107.013-.16.03l9.96 5.467zM2 9.07v8.86h20v-8.86l-10 5.46-10-5.46z"/></svg>
+                    </div>
+                    
+                    <p class="text-center sm:text-left">
+                        <span class="font-bold text-primary-navy block sm:inline">E-mail :</span> 
+                        <a href="mailto:paroiss.anuarite.kolwezi@exemple.com" class="font-bold text-primary-navy hover:text-accent-gold transition-colors block sm:inline">
+                            (paroiss.anuarite.kolwezi@exemple.com)
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </main>
+
+        <footer> 
+            <span class="signature">Gabby Umba</span>
+            <span class="text-gray-500"> | © 2025</span>
+        </footer>
+    </div>
+    <div id="successModal" class="modal-overlay">
+        <div class="modal-content">
+            <svg class="mx-auto w-20 h-20 text-primary-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <h2 class="text-3xl font-display text-gray-800 mt-4 mb-3 font-bold">Témoignage Soumis ! 🙏</h2>
+            <p class="text-gray-600 font-serif">Votre message de soutien est enregistré. Merci pour votre contribution au Livre d'Or de l'Abbé.</p>
+            
+            <a href="livre.html" class="modal-button-link">
+                Voir le Livre d'Or
+            </a>
+
+            <button onclick="closeModal('successModal')" class="mt-4 text-sm text-gray-500 hover:text-gray-800 transition duration-150 font-semibold">
+                Fermer
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // NOUVELLES CLÉS FIREBASE FOURNIES PAR L'UTILISATEUR
+        const firebaseConfig = {
+            apiKey: "AIzaSyDT_tJG17ox5JChrj8Khw_yltdpaJxeJc4",
+            authDomain: "abbepatrick-fe5db.firebaseapp.com",
+            projectId: "abbepatrick-fe5db",
+            storageBucket: "abbepatrick-fe5db.firebasestorage.app",
+            messagingSenderId: "564527267199",
+            appId: "1:564527267199:web:1645bd144ef9f4c0386e4a"
+        };
+        const appId = firebaseConfig.projectId;
+
+        let app = null;
+        let db = null;
+
+        if (typeof firebase !== 'undefined' && typeof firebase.initializeApp === 'function') {
+            try {
+                app = firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                console.log("Firebase initialisé avec succès pour l'Abbé Patrick.");
+            } catch (error) {
+                console.error("ATTENTION: Erreur d'initialisation de Firebase.", error);
+                db = null; 
+            }
+        } else {
+            console.error("Le SDK Firebase n'est pas chargé(e). Envoi impossible.");
+        }
+
+
+        // Références aux éléments du DOM
+        const form = document.getElementById('testimonialForm');
+        const carousel = document.getElementById('heroCarousel');
+        const totalImages = 3; 
+        let currentIndex = 0;
+        const transitionDuration = 1000;
+        const music = document.getElementById('backgroundMusic');
+
+        // Fonctions Modal
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.add('open');
+            modal.querySelector('a, button').focus();
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+        }
+        window.closeModal = closeModal; 
+
+
+        // LOGIQUE D'OUVERTURE DU LIVRE ET DE DÉMARRAGE DU SITE
+        document.addEventListener('DOMContentLoaded', () => {
+            const bookContainer = document.getElementById('bookCoverAnimation');
+            const mainContent = document.getElementById('mainContent');
+            const book = bookContainer.querySelector('.book');
+            
+            // Démarrage de l'animation d'ouverture après un court délai
+            setTimeout(() => {
+                book.classList.add('open'); 
+            }, 500); 
+
+            // Après la durée de l'animation (2s) + un délai de visualisation (1s)
+            setTimeout(() => {
+                // 1. Rendre le contenu principal visible
+                mainContent.classList.remove('hidden-content');
+                mainContent.classList.add('visible-content');
+                
+                // 2. Faire disparaître la couverture animée
+                bookContainer.classList.add('hide'); 
+
+                // 3. Démarrer le carousel après l'ouverture
+                startCarousel();
+            }, 3000); 
+
+            // Déblocage de la musique au premier clic
+            document.body.addEventListener('click', () => {
+                if (music.muted) {
+                    music.muted = false;
+                    music.volume = 0.3;
+                    music.play().catch(e => console.log("La musique n'a pas pu être jouée."));
+                }
+             }, { once: true });
+        });
+
+
+        // LOGIQUE DU CAROUSEL
+        function startCarousel() {
+            if (!carousel) return;
+            const slideWidth = 100 / (totalImages + 1); 
+            
+            setInterval(() => {
+                currentIndex++;
+                const offset = -currentIndex * slideWidth;
+                carousel.style.transition = `transform ${transitionDuration / 1000}s cubic-bezier(0.42, 0, 0.58, 1)`;
+                carousel.style.transform = `translateX(${offset}%)`;
+
+                if (currentIndex >= totalImages) {
+                    setTimeout(() => {
+                        carousel.style.transition = 'none';
+                        currentIndex = 0;
+                        carousel.style.transform = 'translateX(0)';
+                    }, transitionDuration); 
+                }
+            }, 5000); 
+        }
+
+
+        // LOGIQUE DU FORMULAIRE ET CONFETTIS
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.style.display = 'none';
+            closeModal('successModal');
+
+            const name = document.getElementById('name').value.trim();
+            const message = document.getElementById('message').value.trim();
+
+            if (name.length < 5 || message.length < 10) { 
+                errorMessage.textContent = "Merci de signer avec votre nom/qualité (min 5 caractères) et de laisser un message sincère (min 10 caractères).";
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            const submitButton = form.querySelector('button[type="submit"]');
+
+            if (!db) {
+                errorMessage.textContent = `❌ Échec: Le service d'envoi est indisponible. Veuillez vérifier la configuration de Firebase.`;
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            const collectionPath = `artifacts/${appId}/public/data/testimonials`; 
+
+            submitButton.disabled = true;
+            submitButton.textContent = "Envoi en cours...";
+
+            try {
+                await db.collection(collectionPath).add({
+                    name: name,
+                    message: message,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    dateAdded: new Date().toISOString(),
+                    event: "Hommage Abbé Patrick Muswankeng"
+                });
+
+                // Succès : Confettis (Bleu, Or, Blanc)
+                form.reset();
+                confetti({
+                    particleCount: 150,
+                    spread: 90,
+                    origin: { y: 0.6 },
+                    colors: ['#002D62', '#FFD700', '#ffffff', '#0047AB'] 
+                });
+                openModal('successModal');
+                
+            } catch (error) {
+                console.error("Erreur lors de l'ajout du document: ", error);
+                errorMessage.textContent = `❌ Erreur lors de l'envoi. Veuillez vérifier vos règles de sécurité Firestore. Erreur: ${error.message}.`;
+                errorMessage.style.display = 'block';
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = "✨ Soumettre mon Témoignage";
+            }
+        });
+    </script>
+</body>
+</html>
