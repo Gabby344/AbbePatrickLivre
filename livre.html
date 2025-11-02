@@ -36,7 +36,7 @@
         /* Variables CSS (Adaptées au Bleu/Or) */
         :root {
             --primary-color: #002D62;
-            --accent-color: #FFD700;
+            --accent-color: #DAA520; /* J'ai uniformisé l'Or pour qu'il soit plus riche */
             --fond: #fffcf8;
             --fond-secondaire: #f0f4f7;
             --texte: #3c3c3c;
@@ -88,7 +88,7 @@
             width: 100%;
             overflow: hidden;
             position: relative;
-            height: 300px; /* Hauteur fixe pour le carrousel */
+            height: 300px; 
             margin-bottom: 30px;
             border: 5px solid var(--primary-color);
             border-radius: 10px;
@@ -99,7 +99,7 @@
             display: flex;
             width: 100%;
             height: 100%;
-            transition: transform 0.6s ease-in-out; /* Animation douce */
+            transition: transform 0.6s ease-in-out;
         }
 
         .carousel-slide {
@@ -112,7 +112,7 @@
         .carousel-slide img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Assure que l'image couvre la zone */
+            object-fit: cover; 
         }
 
         /* --- Animation d'entrée des messages --- */
@@ -169,17 +169,15 @@
         .testimonial-signature {
             display: block;
             text-align: right;
-            margin-top: 10px;
             font-family: theme('fontFamily.sacramento'); 
             font-size: 2.5rem; 
             color: var(--primary-color);
             line-height: 1;
-            padding-top: 10px;
         }
 
         .testimonial-date {
             font-size: 0.9rem;
-            color: #999;
+            color: #777; /* Rendre la date un peu plus visible */
             font-style: normal; 
             display: block;
             text-align: right;
@@ -211,32 +209,36 @@
         }
         
         .reaction-count {
-            @apply text-sm font-bold text-primary-navy/90 ml-1; /* Ajout d'une petite marge */
+            @apply text-sm font-bold text-primary-navy/90 ml-1; 
         }
         
         .reaction-btn:disabled, .reacted {
-            opacity: 0.6;
+            opacity: 0.8; /* Rendre légèrement plus opaque */
             cursor: default;
-            background-color: #f0f4f7 !important; /* Pour indiquer l'état désactivé/déjà cliqué */
+            background-color: #f0f4f7 !important; 
         }
         
-        /* --- STYLES DES BOUTONS D'ACTION --- */
-        .action-button {
-            @apply inline-flex items-center justify-center
-                     px-10 py-4 
-                     text-xl font-extrabold text-white
-                     rounded-full 
-                     transition-all duration-300 ease-out; 
-            box-shadow: 0 8px 20px rgba(0, 45, 98, 0.5); 
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            width: 300px;
-            margin: 15px auto;
+        /* --- FOOTER AMÉLIORÉ --- */
+        footer {
+            margin-top: 50px;
+            padding: 20px;
+            background-color: var(--primary-color); 
+            color: white;
+            text-align: center;
+            font-size: 0.9rem;
+            width: 100%;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
         }
-
-        /* Styles d'impression pour cacher les éléments interactifs */
+        footer .designer-signature {
+            font-family: theme('fontFamily.sacramento'); 
+            font-size: 1.5rem; 
+            color: theme('colors.accent-gold'); 
+            font-weight: bold;
+        }
+        
+        /* --- Styles d'impression pour cacher les éléments interactifs --- */
         @media print {
-            .no-print, header, footer {
+            .no-print, header, footer { /* AJOUT du footer ici */
                 display: none !important;
             }
             body {
@@ -249,23 +251,18 @@
             }
             .testimonial-card {
                 box-shadow: none;
-                border: 1px solid #ccc; /* Bordure d'impression plus nette */
-                break-inside: avoid; /* Empêche la coupure d'une carte sur deux pages */
+                border: 1px solid #ccc; 
+                break-inside: avoid; 
                 page-break-inside: avoid;
             }
-            .testimonial-card .flex-col, .testimonial-card .justify-between {
-                display: block; /* Simplifier la mise en page d'impression */
-                text-align: right;
+            /* Simplifier l'affichage du nom/date pour l'impression */
+            .only-print .testimonial-date {
+                margin-top: 15px;
+                color: #555;
             }
-            .testimonial-card .flex-col { margin-top: 15px;}
-            .testimonial-message {
-                margin-top: 10px;
-                margin-bottom: 20px;
-                font-style: normal;
+            .only-print .testimonial-signature {
+                font-size: 1.8rem;
                 color: black;
-            }
-            .testimonial-name {
-                border-bottom: 1px solid #ccc;
             }
         }
 
@@ -328,7 +325,7 @@
     </main>
 
     <footer>
-        <span class="text-gray-500 mb-6 block text-sm">--- Un projet développé par <span class="text-primary-navy font-bold">Gabby Umba</span> 2025 ---</span>
+        <span class="text-gray-300">--- Un projet développé par <span class="designer-signature">Gabby Umba</span> 2025 ---</span>
     </footer>
 
 
@@ -364,9 +361,7 @@
         // Clé pour localStorage, empêche les clics multiples de l'utilisateur
         const REACTION_KEY = 'reactedMessages'; 
 
-        /**
-         * @returns {Set<string>} L'ensemble des IDs de documents pour lesquels l'utilisateur a réagi.
-         */
+        // FONCTIONS DE GESTION LOCALSTORAGE (Conservées)
         const getReactedIds = () => {
             try {
                 const stored = localStorage.getItem(REACTION_KEY);
@@ -376,11 +371,6 @@
                 return new Set();
             }
         };
-
-        /**
-         * Ajoute un ID de document à la liste des messages pour lesquels l'utilisateur a réagi.
-         * @param {string} docId L'ID du document Firestore.
-         */
         const addReactedId = (docId) => {
             try {
                 const reactedIds = getReactedIds();
@@ -395,51 +385,46 @@
         const formatDate = (timestamp) => {
             if (!timestamp || !timestamp.toDate) return 'Date non enregistrée';
             const date = timestamp.toDate();
+            // Utiliser des options complètes pour un style solennel
             return date.toLocaleDateString('fr-FR', {
                 day: '2-digit',
-                month: 'long',
+                month: 'long', // Afficher le mois en toutes lettres
                 year: 'numeric'
             });
         };
 
-        // LOGIQUE DES RÉACTIONS (avec incrémentation atomique et gestion UX)
+        // LOGIQUE DES RÉACTIONS (Conservée)
         const handleReaction = async (docId, reactionType, button) => {
             if (!db || button.disabled) return;
             
-            // 1. Vérification locale (Anti-spam simple par localStorage)
             const reactedIds = getReactedIds();
             if (reactedIds.has(docId)) {
                 console.warn("L'utilisateur a déjà réagi à ce message.");
-                button.disabled = true; // S'assurer que le bouton reste désactivé
+                button.disabled = true; 
                 return;
             }
             
-            button.disabled = true; // Désactiver immédiatement pour l'UX
+            button.disabled = true; 
             button.classList.add('reacted');
 
             const docRef = db.collection(collectionPath).doc(docId);
             
             try {
                 await docRef.update({
-                    // Incrémenter la réaction spécifique
                     [`reactions.${reactionType}`]: firebase.firestore.FieldValue.increment(1),
-                    // Incrémenter le total des réactions pour un tri plus facile
                     totalReactions: firebase.firestore.FieldValue.increment(1) 
                 });
 
-                // Mise à jour locale du compte
                 const countElement = button.querySelector('.reaction-count');
                 if (countElement) {
                     const currentCount = parseInt(countElement.textContent) || 0;
                     countElement.textContent = currentCount + 1;
                 }
                 
-                // Enregistrer l'action dans le localStorage
                 addReactedId(docId);
 
             } catch (error) {
                 console.error(`Erreur lors de la réaction (${reactionType}):`, error);
-                // Optionnel: réactiver le bouton en cas d'échec
                 button.disabled = false;
                 button.classList.remove('reacted');
             }
@@ -458,11 +443,12 @@
             try {
                 let query = db.collection(collectionPath);
                 
-                // Logique de tri
+                // Logique de tri optimisée : ajoute le second ordre de tri par défaut (date)
                 if (currentSort === 'date') {
                     query = query.orderBy('timestamp', 'desc');
                 } else if (currentSort === 'popularity') {
-                    // Trier par le total des réactions (champ `totalReactions` ajouté pour la performance)
+                    // S'assurer que 'totalReactions' existe dans Firestore. Il est incrémenté dans handleReaction.
+                    // Si deux messages ont le même score de popularité, le plus récent est affiché en premier.
                     query = query.orderBy('totalReactions', 'desc').orderBy('timestamp', 'desc'); 
                 }
 
@@ -474,7 +460,7 @@
                     return;
                 }
                 
-                container.innerHTML = ''; // Nettoyer après le chargement
+                container.innerHTML = ''; 
                 let count = 0;
                 let delay = 0;
                 const reactedIds = getReactedIds();
@@ -483,7 +469,6 @@
                     const data = doc.data();
                     const docId = doc.id;
                     const formattedDate = formatDate(data.timestamp);
-                    // Initialiser les reactions si le champ n'existe pas
                     const reactions = data.reactions || { heart: 0, blessing: 0, star: 0 }; 
                     count++;
                     
@@ -491,7 +476,6 @@
                     card.className = 'testimonial-card animate-message';
                     card.style.animationDelay = `${delay}ms`; 
                     
-                    // Vérifier si l'utilisateur a déjà réagi à ce message
                     const isReacted = reactedIds.has(docId);
                     const buttonStateClass = isReacted ? 'reacted' : '';
                     const buttonDisabledAttr = isReacted ? 'disabled' : '';
@@ -501,7 +485,7 @@
                         
                         <p class="testimonial-message" aria-label="Message du fidèle">« ${data.message} »</p>
                         
-                        <div class="no-print mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
+                        <div class="no-print mt-8 pt-4 border-t border-gray-100 flex justify-between items-end">
                             <div class="flex space-x-4">
                                 <button class="reaction-btn ${buttonStateClass}" data-reaction="heart" data-doc-id="${docId}" ${buttonDisabledAttr} aria-label="Aimer ce message">
                                     <span class="text-2xl">❤️</span>
@@ -518,14 +502,14 @@
                             </div>
                             
                             <div class="flex flex-col items-end">
-                                <span class="testimonial-date">Publié le ${formattedDate}</span>
                                 <span class="testimonial-signature">${data.name || 'Anonyme'}</span>
+                                <span class="testimonial-date">Publié le ${formattedDate}</span>
                             </div>
                         </div>
                         
                         <div class="only-print flex flex-col items-end pt-4">
-                            <span class="testimonial-date">Publié le ${formattedDate}</span>
                             <span class="testimonial-signature">${data.name || 'Anonyme'}</span>
+                            <span class="testimonial-date">Publié le ${formattedDate}</span>
                         </div>
                     `;
                     container.appendChild(card);
@@ -542,7 +526,7 @@
             }
         };
 
-        // Logique du Carrousel d'Images
+        // Logique du Carrousel d'Images (Conservée)
         let slideIndex = 0;
         
         const showSlides = () => {
@@ -552,7 +536,6 @@
 
             if (totalSlides === 0 || !carouselTrack) return;
             
-            // Calculer le décalage pour afficher l'image courante
             carouselTrack.style.transform = `translateX(${-slideIndex * 100}%)`;
         };
 
@@ -561,7 +544,7 @@
             const totalSlides = slides.length;
             if (totalSlides <= 1) return;
 
-            slideIndex = (slideIndex + 1) % totalSlides; // Boucle au début après la dernière
+            slideIndex = (slideIndex + 1) % totalSlides; 
             showSlides();
         };
 
@@ -569,17 +552,16 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadTestimonials(); 
             
-            // Démarrage du carrousel 
             const totalSlides = document.querySelectorAll('.carousel-slide').length;
             if (totalSlides > 1) {
                 showSlides();
-                setInterval(nextSlide, 5000); // Défilement toutes les 5 secondes
+                setInterval(nextSlide, 5000); 
             }
 
             // Écouteur global pour les boutons de réaction
             document.addEventListener('click', (e) => {
                 const button = e.target.closest('.reaction-btn');
-                if (button && !button.disabled) { // Vérifier si le bouton n'est pas déjà désactivé
+                if (button && !button.disabled) { 
                     const docId = button.dataset.docId;
                     const reactionType = button.dataset.reaction;
                     handleReaction(docId, reactionType, button);
@@ -596,7 +578,6 @@
                 sortByPopularityButton.classList.remove('active');
                 button.classList.add('active');
                 
-                // Changer le tri et recharger
                 currentSort = sortType;
                 loadTestimonials();
             };
