@@ -18,9 +18,9 @@
             theme: {
                 extend: {
                     colors: {
-                        'primary-navy': '#002D62',      /* Bleu Marine Solennel */
-                        'accent-gold': '#FFD700',       /* Or Accent */
-                        'bg-paper': '#fffcf8',          /* Fond de page léger */
+                        'primary-navy': '#002D62',       /* Bleu Marine Solennel */
+                        'accent-gold': '#FFD700',        /* Or Accent */
+                        'bg-paper': '#fffcf8',           /* Fond de page léger */
                     },
                     fontFamily: {
                         'serif': ['Merriweather', 'serif'],
@@ -53,7 +53,7 @@
         }
 
         main {
-            max-width: 900px; /* Légèrement plus large pour les cartes */
+            max-width: 900px;
             margin: 0 auto;
             padding: 0 20px;
             flex-grow: 1;
@@ -83,6 +83,38 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
 
+        /* --- CAROUSEL AMÉLIORÉ --- */
+        .carousel-container {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            height: 300px; /* Hauteur fixe pour le carrousel */
+            margin-bottom: 30px;
+            border: 5px solid var(--primary-color);
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .carousel-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s ease-in-out; /* Animation douce */
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Assure que l'image couvre la zone */
+        }
+
         /* --- Animation d'entrée des messages --- */
         @keyframes fade-in-up {
             from { opacity: 0; transform: translateY(20px); }
@@ -96,16 +128,15 @@
         
         /* --- Cartes de messages (Feuillets de Livre) --- */
         .testimonial-card {
-            background: #ffffff; /* Fond blanc pour simuler le papier */
+            background: #ffffff;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
             margin-bottom: 30px;
             text-align: left;
             position: relative;
-            /* Effet Page */
             border: 1px solid #e0e0e0; 
-            border-left: 10px solid var(--primary-color); /* Bande de couleur pour le dos */
+            border-left: 10px solid var(--primary-color);
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         }
 
@@ -172,30 +203,72 @@
         
         /* --- Styles des Boutons de Réactions --- */
         .reaction-btn {
-            @apply flex items-center p-1.5 rounded-full transition-all duration-200 
-                   border border-gray-200 bg-white hover:bg-accent-gold/20;
+            @apply flex items-center p-1.5 rounded-full transition-all duration-200
+                     border border-gray-200 bg-white hover:bg-accent-gold/20;
             cursor: pointer;
             line-height: 1;
-            user-select: none; /* Empêche la sélection de l'emoji */
+            user-select: none;
         }
         
         .reaction-count {
-            @apply text-sm font-bold text-primary-navy/90;
+            @apply text-sm font-bold text-primary-navy/90 ml-1; /* Ajout d'une petite marge */
+        }
+        
+        .reaction-btn:disabled, .reacted {
+            opacity: 0.6;
+            cursor: default;
+            background-color: #f0f4f7 !important; /* Pour indiquer l'état désactivé/déjà cliqué */
         }
         
         /* --- STYLES DES BOUTONS D'ACTION --- */
         .action-button {
-            @apply inline-flex items-center justify-center 
-                   px-10 py-4 
-                   text-xl font-extrabold text-white
-                   rounded-full 
-                   transition-all duration-300 ease-out; 
+            @apply inline-flex items-center justify-center
+                     px-10 py-4 
+                     text-xl font-extrabold text-white
+                     rounded-full 
+                     transition-all duration-300 ease-out; 
             box-shadow: 0 8px 20px rgba(0, 45, 98, 0.5); 
             letter-spacing: 1px;
             text-transform: uppercase;
             width: 300px;
             margin: 15px auto;
         }
+
+        /* Styles d'impression pour cacher les éléments interactifs */
+        @media print {
+            .no-print, header, footer {
+                display: none !important;
+            }
+            body {
+                background: #ffffff !important;
+                padding: 0;
+            }
+            main {
+                max-width: none;
+                padding: 0;
+            }
+            .testimonial-card {
+                box-shadow: none;
+                border: 1px solid #ccc; /* Bordure d'impression plus nette */
+                break-inside: avoid; /* Empêche la coupure d'une carte sur deux pages */
+                page-break-inside: avoid;
+            }
+            .testimonial-card .flex-col, .testimonial-card .justify-between {
+                display: block; /* Simplifier la mise en page d'impression */
+                text-align: right;
+            }
+            .testimonial-card .flex-col { margin-top: 15px;}
+            .testimonial-message {
+                margin-top: 10px;
+                margin-bottom: 20px;
+                font-style: normal;
+                color: black;
+            }
+            .testimonial-name {
+                border-bottom: 1px solid #ccc;
+            }
+        }
+
     </style>
 </head>
 
@@ -208,18 +281,18 @@
         
         <div class="carousel-container no-print">
             <div class="carousel-track" id="carouselTrack">
-                <div class="carousel-slide"><img src="book_photo1.JPG" alt="Abbé Patrick Muswankeng Image 1"></div>
-                <div class="carousel-slide"><img src="book_photo2.JPG" alt="Abbé Patrick Muswankeng Image 2"></div>
-                <div class="carousel-slide"><img src="book_photo3.JPG" alt="Abbé Patrick Muswankeng Image 3"></div>
+                <div class="carousel-slide"><img src="book_photo1.JPG" alt="Photo de l'Abbé Patrick Muswankeng 1"></div>
+                <div class="carousel-slide"><img src="book_photo2.JPG" alt="Photo de l'Abbé Patrick Muswankeng 2"></div>
+                <div class="carousel-slide"><img src="book_photo3.JPG" alt="Photo de l'Abbé Patrick Muswankeng 3"></div>
             </div>
-        </div>
+            </div>
 
         <h1 class="main-title text-5xl lg:text-6xl text-center mt-12 mb-2 font-extrabold tracking-widest">
             <span class="text-accent-gold text-7xl mr-2">☧</span> Feuillets du Livre d'Or
         </h1>
         
         <p id="messageCount" class="text-xl font-display text-gray-700 mb-8 font-bold">
-            <span class="text-4xl text-primary-navy font-extrabold" id="countValue">...</span> messages enregistrés pour l'Abbé 📜
+            <span class="text-4xl text-primary-navy font-extrabold" id="countValue">0</span> messages enregistrés pour l'Abbé 📜
         </p>
 
         <blockquote class="intro-quote">
@@ -228,15 +301,16 @@
 
         <div class="no-print flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-5 mb-10">
             <span class="text-lg font-bold text-primary-navy">Trier par :</span>
-            <button id="sortByDate" class="filter-btn active" data-sort="date">
+            <button id="sortByDate" class="filter-btn active" data-sort="date" aria-label="Trier par les messages les plus récents">
                 <span class="mr-2">🕒</span> Récents
             </button>
-            <button id="sortByPopularity" class="filter-btn" data-sort="popularity">
-                <span class="mr-2">🔥</span> Les plus aimés
+            <button id="sortByPopularity" class="filter-btn" data-sort="popularity" aria-label="Trier par les messages les plus populaires (nombre de coeurs)">
+                <span class="mr-2">❤️</span> Les plus aimés
             </button>
         </div>
 
-        <section id="testimonialsContainer" class="mt-8"></section>
+        <section id="testimonialsContainer" class="mt-8">
+             </section>
 
         <div class="no-print flex flex-col items-center justify-center pt-8 pb-16">
             
@@ -259,7 +333,7 @@
 
 
     <script>
-        // Clés Firebase utilisées dans l'index.html de l'Abbé (MISES À JOUR)
+        // Clés Firebase (À mettre à jour avec les vôtres)
         const firebaseConfig = {
             apiKey: "AIzaSyDT_tJG17ox5JChrj8Khw_yltdpaJxeJc4",
             authDomain: "abbepatrick-fe5db.firebaseapp.com",
@@ -281,11 +355,41 @@
             console.error("Erreur d'initialisation de Firebase.", error);
         }
 
-        // Références aux éléments du DOM
+        // Références DOM
         const container = document.getElementById('testimonialsContainer');
         const countValue = document.getElementById('countValue');
         const collectionPath = `artifacts/${appId}/public/data/testimonials`;
         let currentSort = 'date'; // Tri par défaut
+        
+        // Clé pour localStorage, empêche les clics multiples de l'utilisateur
+        const REACTION_KEY = 'reactedMessages'; 
+
+        /**
+         * @returns {Set<string>} L'ensemble des IDs de documents pour lesquels l'utilisateur a réagi.
+         */
+        const getReactedIds = () => {
+            try {
+                const stored = localStorage.getItem(REACTION_KEY);
+                return new Set(stored ? JSON.parse(stored) : []);
+            } catch (e) {
+                console.error("Erreur de lecture de localStorage:", e);
+                return new Set();
+            }
+        };
+
+        /**
+         * Ajoute un ID de document à la liste des messages pour lesquels l'utilisateur a réagi.
+         * @param {string} docId L'ID du document Firestore.
+         */
+        const addReactedId = (docId) => {
+            try {
+                const reactedIds = getReactedIds();
+                reactedIds.add(docId);
+                localStorage.setItem(REACTION_KEY, JSON.stringify([...reactedIds]));
+            } catch (e) {
+                console.error("Erreur d'écriture de localStorage:", e);
+            }
+        };
 
         // Fonction de formatage de la date (J/M/A)
         const formatDate = (timestamp) => {
@@ -298,37 +402,53 @@
             });
         };
 
-        // LOGIQUE DES RÉACTIONS (avec incrémentation atomique)
+        // LOGIQUE DES RÉACTIONS (avec incrémentation atomique et gestion UX)
         const handleReaction = async (docId, reactionType, button) => {
-            if (!db) return;
+            if (!db || button.disabled) return;
+            
+            // 1. Vérification locale (Anti-spam simple par localStorage)
+            const reactedIds = getReactedIds();
+            if (reactedIds.has(docId)) {
+                console.warn("L'utilisateur a déjà réagi à ce message.");
+                button.disabled = true; // S'assurer que le bouton reste désactivé
+                return;
+            }
+            
+            button.disabled = true; // Désactiver immédiatement pour l'UX
+            button.classList.add('reacted');
+
             const docRef = db.collection(collectionPath).doc(docId);
             
             try {
                 await docRef.update({
-                    [`reactions.${reactionType}`]: firebase.firestore.FieldValue.increment(1)
+                    // Incrémenter la réaction spécifique
+                    [`reactions.${reactionType}`]: firebase.firestore.FieldValue.increment(1),
+                    // Incrémenter le total des réactions pour un tri plus facile
+                    totalReactions: firebase.firestore.FieldValue.increment(1) 
                 });
 
-                // Mise à jour locale (sans recharger tous les messages)
+                // Mise à jour locale du compte
                 const countElement = button.querySelector('.reaction-count');
                 if (countElement) {
                     const currentCount = parseInt(countElement.textContent) || 0;
                     countElement.textContent = currentCount + 1;
                 }
                 
-                // Optionnel: Désactiver le bouton pour l'utilisateur après le clic (pour éviter le spam)
-                button.disabled = true;
-                button.style.opacity = 0.6;
-                button.style.cursor = 'default';
+                // Enregistrer l'action dans le localStorage
+                addReactedId(docId);
 
             } catch (error) {
                 console.error(`Erreur lors de la réaction (${reactionType}):`, error);
+                // Optionnel: réactiver le bouton en cas d'échec
+                button.disabled = false;
+                button.classList.remove('reacted');
             }
         };
 
         // Fonction pour charger et afficher les messages (avec tri)
         const loadTestimonials = async () => {
             if (!db) {
-                container.innerHTML = `<div class="mt-16 p-6 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg"><p class="text-xl font-bold font-display">❌ Erreur: Base de données non connectée.</p><p class="mt-2">Veuillez vérifier vos clés Firebase dans le script.</p></div>`;
+                container.innerHTML = `<div class="mt-16 p-6 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg" role="alert"><p class="text-xl font-bold font-display">❌ Erreur: Base de données non connectée.</p><p class="mt-2">Veuillez vérifier vos clés Firebase dans le script.</p></div>`;
                 countValue.textContent = 'Erreur';
                 return;
             }
@@ -342,9 +462,8 @@
                 if (currentSort === 'date') {
                     query = query.orderBy('timestamp', 'desc');
                 } else if (currentSort === 'popularity') {
-                    // Trier par le total des réactions (plus complexe, non pris en charge directement)
-                    // Pour simplifier, nous allons trier par le nombre de "coeurs" pour l'exemple
-                    query = query.orderBy('reactions.heart', 'desc');
+                    // Trier par le total des réactions (champ `totalReactions` ajouté pour la performance)
+                    query = query.orderBy('totalReactions', 'desc').orderBy('timestamp', 'desc'); 
                 }
 
                 const snapshot = await query.get();
@@ -358,33 +477,41 @@
                 container.innerHTML = ''; // Nettoyer après le chargement
                 let count = 0;
                 let delay = 0;
+                const reactedIds = getReactedIds();
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
+                    const docId = doc.id;
                     const formattedDate = formatDate(data.timestamp);
-                    const reactions = data.reactions || { heart: 0, star: 0, party: 0 };
+                    // Initialiser les reactions si le champ n'existe pas
+                    const reactions = data.reactions || { heart: 0, blessing: 0, star: 0 }; 
                     count++;
                     
                     const card = document.createElement('div');
                     card.className = 'testimonial-card animate-message';
                     card.style.animationDelay = `${delay}ms`; 
                     
+                    // Vérifier si l'utilisateur a déjà réagi à ce message
+                    const isReacted = reactedIds.has(docId);
+                    const buttonStateClass = isReacted ? 'reacted' : '';
+                    const buttonDisabledAttr = isReacted ? 'disabled' : '';
+
                     card.innerHTML = `
                         <p class="testimonial-name">Témoignage de ${data.name || 'Anonyme'}</p>
                         
-                        <p class="testimonial-message">« ${data.message} »</p>
+                        <p class="testimonial-message" aria-label="Message du fidèle">« ${data.message} »</p>
                         
-                        <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
+                        <div class="no-print mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
                             <div class="flex space-x-4">
-                                <button class="reaction-btn" data-reaction="heart" data-doc-id="${doc.id}">
+                                <button class="reaction-btn ${buttonStateClass}" data-reaction="heart" data-doc-id="${docId}" ${buttonDisabledAttr} aria-label="Aimer ce message">
                                     <span class="text-2xl">❤️</span>
                                     <span class="reaction-count">${reactions.heart || 0}</span>
                                 </button>
-                                <button class="reaction-btn" data-reaction="blessing" data-doc-id="${doc.id}">
+                                <button class="reaction-btn ${buttonStateClass}" data-reaction="blessing" data-doc-id="${docId}" ${buttonDisabledAttr} aria-label="Envoyer une bénédiction">
                                     <span class="text-2xl">🙏</span>
                                     <span class="reaction-count">${reactions.blessing || 0}</span>
                                 </button>
-                                <button class="reaction-btn" data-reaction="star" data-doc-id="${doc.id}">
+                                <button class="reaction-btn ${buttonStateClass}" data-reaction="star" data-doc-id="${docId}" ${buttonDisabledAttr} aria-label="Marquer ce message d'une étoile">
                                     <span class="text-2xl">🌟</span>
                                     <span class="reaction-count">${reactions.star || 0}</span>
                                 </button>
@@ -394,6 +521,11 @@
                                 <span class="testimonial-date">Publié le ${formattedDate}</span>
                                 <span class="testimonial-signature">${data.name || 'Anonyme'}</span>
                             </div>
+                        </div>
+                        
+                        <div class="only-print flex flex-col items-end pt-4">
+                            <span class="testimonial-date">Publié le ${formattedDate}</span>
+                            <span class="testimonial-signature">${data.name || 'Anonyme'}</span>
                         </div>
                     `;
                     container.appendChild(card);
@@ -405,7 +537,7 @@
                 
             } catch (error) {
                 console.error("Erreur de chargement des messages:", error);
-                container.innerHTML = `<div class="mt-16 p-6 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg"><p class="text-xl font-bold font-display">❌ Erreur de Connexion à la base de données.</p><p class="mt-2">Veuillez vérifier vos règles Firestore (allow read: true) et l'ID de projet.</p></div>`;
+                container.innerHTML = `<div class="mt-16 p-6 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg" role="alert"><p class="text-xl font-bold font-display">❌ Erreur de Connexion à la base de données.</p><p class="mt-2">Veuillez vérifier vos règles Firestore (allow read: true) et l'ID de projet.</p></div>`;
                 countValue.textContent = 'Erreur';
             }
         };
@@ -420,6 +552,7 @@
 
             if (totalSlides === 0 || !carouselTrack) return;
             
+            // Calculer le décalage pour afficher l'image courante
             carouselTrack.style.transform = `translateX(${-slideIndex * 100}%)`;
         };
 
@@ -428,7 +561,7 @@
             const totalSlides = slides.length;
             if (totalSlides <= 1) return;
 
-            slideIndex = (slideIndex + 1) % totalSlides;
+            slideIndex = (slideIndex + 1) % totalSlides; // Boucle au début après la dernière
             showSlides();
         };
 
@@ -440,13 +573,13 @@
             const totalSlides = document.querySelectorAll('.carousel-slide').length;
             if (totalSlides > 1) {
                 showSlides();
-                setInterval(nextSlide, 5000); 
+                setInterval(nextSlide, 5000); // Défilement toutes les 5 secondes
             }
 
             // Écouteur global pour les boutons de réaction
             document.addEventListener('click', (e) => {
                 const button = e.target.closest('.reaction-btn');
-                if (button) {
+                if (button && !button.disabled) { // Vérifier si le bouton n'est pas déjà désactivé
                     const docId = button.dataset.docId;
                     const reactionType = button.dataset.reaction;
                     handleReaction(docId, reactionType, button);
@@ -458,11 +591,9 @@
             const sortByPopularityButton = document.getElementById('sortByPopularity');
 
             const handleSortClick = (button, sortType) => {
-                // Désactiver tous les boutons
+                // Désactiver/Activer les classes 'active'
                 sortByDateButton.classList.remove('active');
                 sortByPopularityButton.classList.remove('active');
-                
-                // Activer le bouton cliqué
                 button.classList.add('active');
                 
                 // Changer le tri et recharger
