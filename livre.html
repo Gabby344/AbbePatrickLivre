@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Feuillets du Livre d'Or - Abbé Patrick Muswankeng</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@300;400;700&family=Sacramento&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Configuration Tailwind adaptée au Thème Solennel (Bleu/Or)
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-navy': '#002D62',      /* Bleu Marine Solennel */
+                        'accent-gold': '#FFD700',       /* Or Accent */
+                        'bg-paper': '#fffcf8',          /* Fond de page léger */
+                    },
+                    fontFamily: {
+                        'serif': ['Merriweather', 'serif'],
+                        'display': ['Playfair Display', 'serif'],
+                        'sacramento': ['Sacramento', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Variables CSS (Adaptées au Bleu/Or) */
+        :root {
+            --primary-color: #002D62;
+            --accent-color: #FFD700;
+            --fond: #fffcf8;
+            --fond-secondaire: #f0f4f7;
+            --texte: #3c3c3c;
+        }
+
+        body {
+            font-family: theme('fontFamily.serif');
+            background: linear-gradient(135deg, var(--fond), var(--fond-secondaire));
+            color: var(--texte);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        main {
+            max-width: 900px; /* Légèrement plus large pour les cartes */
+            margin: 0 auto;
+            padding: 0 20px;
+            flex-grow: 1;
+        }
+
+        /* --- STYLES GÉNÉRAUX --- */
+        .main-title {
+            color: var(--primary-color);
+            font-family: theme('fontFamily.display');
+            letter-spacing: 3px;
+            text-shadow: 2px 3px 5px rgba(0,0,0,0.1); 
+            font-weight: 700;
+        }
+        
+        .intro-quote {
+            max-width: 700px;
+            margin: 30px auto 40px auto;
+            font-family: theme('fontFamily.serif');
+            font-size: 1.5rem;
+            line-height: 1.8;
+            color: #555;
+            border-left: 5px solid var(--accent-color);
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.7); 
+            border-radius: 5px;
+            font-style: italic;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        /* --- Animation d'entrée des messages --- */
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-message {
+            animation: fade-in-up 0.5s ease-out forwards;
+            opacity: 0; 
+        }
+        
+        /* --- Cartes de messages (Feuillets de Livre) --- */
+        .testimonial-card {
+            background: #ffffff; /* Fond blanc pour simuler le papier */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            margin-bottom: 30px;
+            text-align: left;
+            position: relative;
+            /* Effet Page */
+            border: 1px solid #e0e0e0; 
+            border-left: 10px solid var(--primary-color); /* Bande de couleur pour le dos */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .testimonial-name {
+            font-family: theme('fontFamily.display');
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            padding-left: 0; 
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--accent-color);
+        }
+        
+        .testimonial-message {
+            font-size: 1.15em;
+            line-height: 1.7;
+            margin-top: 20px;
+            padding-left: 0;
+            color: #444;
+            font-style: italic;
+        }
+        
+        /* --- Signature Manuscrite --- */
+        .testimonial-signature {
+            display: block;
+            text-align: right;
+            margin-top: 10px;
+            font-family: theme('fontFamily.sacramento'); 
+            font-size: 2.5rem; 
+            color: var(--primary-color);
+            line-height: 1;
+            padding-top: 10px;
+        }
+
+        .testimonial-date {
+            font-size: 0.9rem;
+            color: #999;
+            font-style: normal; 
+            display: block;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        /* --- Styles Boutons de Tri --- */
+        .filter-btn {
+            @apply px-5 py-2 text-base font-semibold rounded-full transition-colors duration-200;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background-color: transparent;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(0, 45, 98, 0.4);
+        }
+        
+        /* --- Styles des Boutons de Réactions --- */
+        .reaction-btn {
+            @apply flex items-center p-1.5 rounded-full transition-all duration-200 
+                   border border-gray-200 bg-white hover:bg-accent-gold/20;
+            cursor: pointer;
+            line-height: 1;
+            user-select: none; /* Empêche la sélection de l'emoji */
+        }
+        
+        .reaction-count {
+            @apply text-sm font-bold text-primary-navy/90;
+        }
+        
+        /* --- STYLES DES BOUTONS D'ACTION --- */
+        .action-button {
+            @apply inline-flex items-center justify-center 
+                   px-10 py-4 
+                   text-xl font-extrabold text-white
+                   rounded-full 
+                   transition-all duration-300 ease-out; 
+            box-shadow: 0 8px 20px rgba(0, 45, 98, 0.5); 
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            width: 300px;
+            margin: 15px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="no-print">
+        <div class="h-5 bg-primary-navy"></div>
+    </header>
+
+    <main>
+        
+        <div class="carousel-container no-print">
+            <div class="carousel-track" id="carouselTrack">
+                <div class="carousel-slide"><img src="book_photo1.JPG" alt="Abbé Patrick Muswankeng Image 1"></div>
+                <div class="carousel-slide"><img src="book_photo2.JPG" alt="Abbé Patrick Muswankeng Image 2"></div>
+                <div class="carousel-slide"><img src="book_photo3.JPG" alt="Abbé Patrick Muswankeng Image 3"></div>
+            </div>
+        </div>
+
+        <h1 class="main-title text-5xl lg:text-6xl text-center mt-12 mb-2 font-extrabold tracking-widest">
+            <span class="text-accent-gold text-7xl mr-2">☧</span> Feuillets du Livre d'Or
+        </h1>
+        
+        <p id="messageCount" class="text-xl font-display text-gray-700 mb-8 font-bold">
+            <span class="text-4xl text-primary-navy font-extrabold" id="countValue">...</span> messages enregistrés pour l'Abbé 📜
+        </p>
+
+        <blockquote class="intro-quote">
+            « La plus grande bénédiction de notre ministère est le souvenir que nous laissons dans le cœur des fidèles. Feuilletons ces marques d'amour et de prière. »
+        </blockquote>
+
+        <div class="no-print flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-5 mb-10">
+            <span class="text-lg font-bold text-primary-navy">Trier par :</span>
+            <button id="sortByDate" class="filter-btn active" data-sort="date">
+                <span class="mr-2">🕒</span> Récents
+            </button>
+            <button id="sortByPopularity" class="filter-btn" data-sort="popularity">
+                <span class="mr-2">🔥</span> Les plus aimés
+            </button>
+        </div>
+
+        <section id="testimonialsContainer" class="mt-8"></section>
+
+        <div class="no-print flex flex-col items-center justify-center pt-8 pb-16">
+            
+            <button id="printButton" class="action-button" onclick="window.print()" style="background: linear-gradient(135deg, #4CAF50, #008000);">
+                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m0 0v-2a2 2 0 012-2h4a2 2 0 012 2v2m-5 0h2m-7.5 0h3"></path></svg>
+                Imprimer le livre
+            </button>
+            
+            <a href="index.html" id="returnButton" class="action-button" style="background: linear-gradient(135deg, var(--primary-color), #0047AB);">
+                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"></path></svg>
+                Retourner à la page d'accueil
+            </a>
+        </div>
+
+    </main>
+
+    <footer>
+        <span class="text-gray-500 mb-6 block text-sm">--- Un projet développé par <span class="text-primary-navy font-bold">Gabby Umba</span> 2025 ---</span>
+    </footer>
+
+
+    <script>
+        // Clés Firebase utilisées dans l'index.html de l'Abbé (MISES À JOUR)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDT_tJG17ox5JChrj8Khw_yltdpaJxeJc4",
+            authDomain: "abbepatrick-fe5db.firebaseapp.com",
+            projectId: "abbepatrick-fe5db",
+            storageBucket: "abbepatrick-fe5db.firebasestorage.app",
+            messagingSenderId: "564527267199",
+            appId: "1:564527267199:web:1645bd144ef9f4c0386e4a"
+        };
+        const appId = firebaseConfig.projectId;
+
+        // Initialisation Firebase
+        let app = null;
+        let db = null;
+        try {
+            app = firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            console.log("Firebase initialisé avec succès.");
+        } catch (error) {
+            console.error("Erreur d'initialisation de Firebase.", error);
+        }
+
+        // Références aux éléments du DOM
+        const container = document.getElementById('testimonialsContainer');
+        const countValue = document.getElementById('countValue');
+        const collectionPath = `artifacts/${appId}/public/data/testimonials`;
+        let currentSort = 'date'; // Tri par défaut
+
+        // Fonction de formatage de la date (J/M/A)
+        const formatDate = (timestamp) => {
+            if (!timestamp || !timestamp.toDate) return 'Date non enregistrée';
+            const date = timestamp.toDate();
+            return date.toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+        };
+
+        // LOGIQUE DES RÉACTIONS (avec incrémentation atomique)
+        const handleReaction = async (docId, reactionType, button) => {
+            if (!db) return;
+            const docRef = db.collection(collectionPath).doc(docId);
+            
+            try {
+                await docRef.update({
+                    [`reactions.${reactionType}`]: firebase.firestore.FieldValue.increment(1)
+                });
+
+                // Mise à jour locale (sans recharger tous les messages)
+                const countElement = button.querySelector('.reaction-count');
+                if (countElement) {
+                    const currentCount = parseInt(countElement.textContent) || 0;
+                    countElement.textContent = currentCount + 1;
+                }
+                
+                // Optionnel: Désactiver le bouton pour l'utilisateur après le clic (pour éviter le spam)
+                button.disabled = true;
+                button.style.opacity = 0.6;
+                button.style.cursor = 'default';
+
+            } catch (error) {
+                console.error(`Erreur lors de la réaction (${reactionType}):`, error);
+            }
+        };
+
+        // Fonction pour charger et afficher les messages (avec tri)
+        const loadTestimonials = async () => {
+            if (!db) {
+                container.innerHTML = `<div class="mt-16 p-6 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg"><p class="text-xl font-bold font-display">❌ Erreur: Base de données non connectée.</p><p class="mt-2">Veuillez vérifier vos clés Firebase dans le script.</p></div>`;
+                countValue.textContent = 'Erreur';
+                return;
+            }
+
+            container.innerHTML = '<p class="text-2xl text-primary-navy/70 mt-16 font-display">Chargement des feuillets... ⏳</p>';
+            
+            try {
+                let query = db.collection(collectionPath);
+                
+                // Logique de tri
+                if (currentSort === 'date') {
+                    query = query.orderBy('timestamp', 'desc');
+                } else if (currentSort === 'popularity') {
+                    // Trier par le total des réactions (plus complexe, non pris en charge directement)
+                    // Pour simplifier, nous allons trier par le nombre de "coeurs" pour l'exemple
+                    query = query.orderBy('reactions.heart', 'desc');
+                }
+
+                const snapshot = await query.get();
+
+                if (snapshot.empty) {
+                    container.innerHTML = '<p class="text-2xl text-gray-500 mt-16 font-display">Aucun message n\'a encore été enregistré. Soyez le premier !</p>';
+                    countValue.textContent = '0';
+                    return;
+                }
+                
+                container.innerHTML = ''; // Nettoyer après le chargement
+                let count = 0;
+                let delay = 0;
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const formattedDate = formatDate(data.timestamp);
+                    const reactions = data.reactions || { heart: 0, star: 0, party: 0 };
+                    count++;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'testimonial-card animate-message';
+                    card.style.animationDelay = `${delay}ms`; 
+                    
+                    card.innerHTML = `
+                        <p class="testimonial-name">Témoignage de ${data.name || 'Anonyme'}</p>
+                        
+                        <p class="testimonial-message">« ${data.message} »</p>
+                        
+                        <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
+                            <div class="flex space-x-4">
+                                <button class="reaction-btn" data-reaction="heart" data-doc-id="${doc.id}">
+                                    <span class="text-2xl">❤️</span>
+                                    <span class="reaction-count">${reactions.heart || 0}</span>
+                                </button>
+                                <button class="reaction-btn" data-reaction="blessing" data-doc-id="${doc.id}">
+                                    <span class="text-2xl">🙏</span>
+                                    <span class="reaction-count">${reactions.blessing || 0}</span>
+                                </button>
+                                <button class="reaction-btn" data-reaction="star" data-doc-id="${doc.id}">
+                                    <span class="text-2xl">🌟</span>
+                                    <span class="reaction-count">${reactions.star || 0}</span>
+                                </button>
+                            </div>
+                            
+                            <div class="flex flex-col items-end">
+                                <span class="testimonial-date">Publié le ${formattedDate}</span>
+                                <span class="testimonial-signature">${data.name || 'Anonyme'}</span>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                    
+                    delay += 100;
+                });
+
+                countValue.textContent = count;
+                
+            } catch (error) {
+                console.error("Erreur de chargement des messages:", error);
+                container.innerHTML = `<div class="mt-16 p-6 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg"><p class="text-xl font-bold font-display">❌ Erreur de Connexion à la base de données.</p><p class="mt-2">Veuillez vérifier vos règles Firestore (allow read: true) et l'ID de projet.</p></div>`;
+                countValue.textContent = 'Erreur';
+            }
+        };
+
+        // Logique du Carrousel d'Images
+        let slideIndex = 0;
+        
+        const showSlides = () => {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const totalSlides = slides.length;
+            const carouselTrack = document.getElementById('carouselTrack');
+
+            if (totalSlides === 0 || !carouselTrack) return;
+            
+            carouselTrack.style.transform = `translateX(${-slideIndex * 100}%)`;
+        };
+
+        const nextSlide = () => {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const totalSlides = slides.length;
+            if (totalSlides <= 1) return;
+
+            slideIndex = (slideIndex + 1) % totalSlides;
+            showSlides();
+        };
+
+        // Chargement initial des messages et gestion des événements
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTestimonials(); 
+            
+            // Démarrage du carrousel 
+            const totalSlides = document.querySelectorAll('.carousel-slide').length;
+            if (totalSlides > 1) {
+                showSlides();
+                setInterval(nextSlide, 5000); 
+            }
+
+            // Écouteur global pour les boutons de réaction
+            document.addEventListener('click', (e) => {
+                const button = e.target.closest('.reaction-btn');
+                if (button) {
+                    const docId = button.dataset.docId;
+                    const reactionType = button.dataset.reaction;
+                    handleReaction(docId, reactionType, button);
+                }
+            });
+
+            // Écouteurs pour les boutons de tri
+            const sortByDateButton = document.getElementById('sortByDate');
+            const sortByPopularityButton = document.getElementById('sortByPopularity');
+
+            const handleSortClick = (button, sortType) => {
+                // Désactiver tous les boutons
+                sortByDateButton.classList.remove('active');
+                sortByPopularityButton.classList.remove('active');
+                
+                // Activer le bouton cliqué
+                button.classList.add('active');
+                
+                // Changer le tri et recharger
+                currentSort = sortType;
+                loadTestimonials();
+            };
+
+            sortByDateButton.addEventListener('click', () => handleSortClick(sortByDateButton, 'date'));
+            sortByPopularityButton.addEventListener('click', () => handleSortClick(sortByPopularityButton, 'popularity'));
+        });
+    </script>
+</body>
+</html>
