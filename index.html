@@ -81,7 +81,7 @@
             pointer-events: auto;
         }
         
-        /* --- STYLES POUR L'ANIMATION LIVRE D'OR (Non modifiés) --- */
+        /* --- STYLES POUR L'ANIMATION LIVRE D'OR (Conservés) --- */
         .book-container {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             display: flex; justify-content: center; align-items: center;
@@ -132,7 +132,62 @@
         .book.open .page { transform: rotateY(-175deg); transition-delay: 0.1s; }
         /* --- FIN STYLES LIVRE D'OR --- */
 
-        /* Animation de Pulsation pour le Bouton Accès */
+        /* --- STYLES CAROUSEL AMÉLIORÉS --- */
+        .hero {
+            position: relative;
+            height: 60vh; /* Hauteur de la zone visible */
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-top: 30px;
+        }
+        .carousel {
+            display: flex;
+            height: 100%;
+            width: 100%; /* Sera ajusté par JS */
+            transition: transform 1s cubic-bezier(0.42, 0, 0.58, 1);
+        }
+        .carousel-item {
+            flex-shrink: 0; /* Empêche le redimensionnement */
+            width: 100%; 
+            height: 100%;
+        }
+        .hero-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Assure que l'image couvre bien l'espace */
+            display: block;
+        }
+        .hero-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            background: rgba(0, 0, 0, 0.5); /* Ombre semi-transparente pour la lisibilité */
+            padding: 20px;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+        }
+        .hero-text h1 {
+            font-family: theme('fontFamily.display');
+            font-size: 3rem;
+            color: theme('colors.accent-gold');
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+        }
+        .hero-text p {
+            font-size: 1.5rem;
+            font-style: italic;
+            max-width: 80%;
+        }
+        /* --- FIN STYLES CAROUSEL --- */
+
+        /* Styles de boutons et autres éléments (Conservés) */
         @keyframes pulse-book {
             0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(218, 165, 32, 0.7); }
             70% { transform: scale(1.03); box-shadow: 0 0 0 15px rgba(218, 165, 32, 0); }
@@ -148,15 +203,14 @@
             box-shadow: 0 10px 30px rgba(218, 165, 32, 0.6); 
             letter-spacing: 1.5px; 
             text-transform: uppercase; 
-            animation: pulse-book 2s infinite; /* Ajout de l'effet de pulsation */
+            animation: pulse-book 2s infinite; 
         }
         .book-button:hover { 
             transform: scale(1.05) translateY(-3px); 
             box-shadow: 0 15px 40px rgba(218, 165, 32, 0.8); 
-            animation: none; /* Arrêter la pulsation au survol */
+            animation: none;
         }
         
-        /* Styles pour la Section Promotion */
         .promotion-box {
             background: linear-gradient(135deg, theme('colors.primary-navy'), #0047AB);
             color: white;
@@ -198,11 +252,27 @@
              color: theme('colors.accent-gold');
              margin-top: 5px;
         }
-
-        /* Maintenir les styles existants (formulaires, carousel, etc.) */
-        /* ... (les styles de .hero, form, input, modal etc. de votre code original sont conservés) ... */
+        
         h1:not(.hero-text h1) { color: var(--primary-color); font-family: theme('fontFamily.display'); letter-spacing: 3px; text-shadow: 2px 3px 5px rgba(0,0,0,0.1); font-weight: 700; }
-        /* ... autres styles ... */
+        
+        /* --- STYLES FOOTER AMÉLIORÉS --- */
+        footer {
+            margin-top: 50px;
+            padding: 20px;
+            background-color: var(--primary-color); 
+            color: white;
+            text-align: center;
+            font-size: 0.9rem;
+            width: 100%;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+        }
+        footer .signature {
+            font-family: theme('fontFamily.sacramento'); 
+            font-size: 1.4rem; 
+            color: theme('colors.accent-gold'); 
+            margin-right: 10px;
+        }
+        /* Styles de formulaire et modal (Conservés, supposés être définis ailleurs ou dans Tailwind) */
 
     </style>
 </head>
@@ -235,16 +305,14 @@
                     <div class="carousel-item"><img src="photo1.jpeg" alt="Abbé Patrick Muswankeng - Photo 1" class="hero-img"></div>
                     <div class="carousel-item"><img src="paroisse_anuarite.jpeg" alt="Paroisse Bienheureuse Anuarite" class="hero-img"></div>
                     <div class="carousel-item"><img src="photo2.jpeg" alt="Abbé Patrick Muswankeng - Photo 2" class="hero-img"></div>
-                    <div class="carousel-item" id="firstClone"><img src="photo3jpeg" alt="Abbé Patrick Muswankeng - Photo 1" class="hero-img"></div>
-                    <div class="carousel-item" id="firstClone"><img src="photo4.jpeg" alt="Abbé Patrick Muswankeng - Photo 1" class="hero-img"></div>
-                    <div class="carousel-item" id="firstClone"><img src="photo5" alt="Abbé Patrick Muswankeng - Photo 1" class="hero-img"></div>
-                    <div class="carousel-item" id="firstClone"><img src="photo6.jpeg" alt="Abbé Patrick Muswankeng - Photo 1" class="hero-img"></div>
-                    <div class="carousel-item" id="firstClone"><img src="photo7.jpeg" alt="Abbé Patrick Muswankeng - Photo 1" class="hero-img"></div>
+                    <div class="carousel-item"><img src="photo3.jpeg" alt="Abbé Patrick Muswankeng - Photo 3" class="hero-img"></div> <div class="carousel-item"><img src="photo4.jpeg" alt="Abbé Patrick Muswankeng - Photo 4" class="hero-img"></div>
+                    <div class="carousel-item"><img src="photo5.jpeg" alt="Abbé Patrick Muswankeng - Photo 5" class="hero-img"></div> <div class="carousel-item"><img src="photo6.jpeg" alt="Abbé Patrick Muswankeng - Photo 6" class="hero-img"></div>
+                    <div class="carousel-item"><img src="photo7.jpeg" alt="Abbé Patrick Muswankeng - Photo 7" class="hero-img"></div>
                 </div>
                 
                 <div class="hero-text">
                     <h1>🕊️ Livre d'Or Virtuel</h1>
-                    <p>« Au service de Dieu et des Hommes. Curé de la Paroisse Bienheureuse Anuarite Nengapeta. »</p>
+                    <p class="text-xl sm:text-2xl italic font-light">« Au service de Dieu et des Hommes. Curé de la Paroisse Bienheureuse Anuarite Nengapeta. »</p>
                 </div>
             </section>
 
@@ -298,14 +366,14 @@
                     Contacter Gabby Umba (+243 99 72 27 819)
                 </a>
                 <p class="text-sm text-gray-400 mt-2">
-                    *Veuillez remplacer le numéro placeholder par le vrai numéro de Gabby Umba pour le lien.
+                    *Le numéro WhatsApp est un exemple.
                 </p>
             </div>
             </main>
 
         <footer> 
             <span class="signature">Gabby Umba</span>
-            <span class="text-gray-500"> | © 2025 - Réalisation Digitale pour la Paroisse Bienheureuse Anuarite</span>
+            <span class="text-gray-300"> | © 2025 - Réalisation Digitale pour la Paroisse Bienheureuse Anuarite</span>
         </footer>
     </div>
     
@@ -356,7 +424,7 @@
 
         const form = document.getElementById('testimonialForm');
         const carousel = document.getElementById('heroCarousel');
-        const totalImages = 3; 
+        const totalImages = 8; // Le nombre total d'images (8)
         let currentIndex = 0;
         const transitionDuration = 1000;
         const music = document.getElementById('backgroundMusic');
@@ -372,31 +440,23 @@
         window.closeModal = closeModal; 
 
 
-        // LOGIQUE D'OUVERTURE DU LIVRE ET DE DÉMARRAGE DU SITE
+        // LOGIQUE D'OUVERTURE DU LIVRE ET DE DÉMARRAGE DU SITE (Conservée)
         document.addEventListener('DOMContentLoaded', () => {
             const bookContainer = document.getElementById('bookCoverAnimation');
             const mainContent = document.getElementById('mainContent');
             const book = bookContainer.querySelector('.book');
             
-            // Délai de 0.5s avant de commencer l'ouverture du livre (visuellement plus lent)
             setTimeout(() => {
                 book.classList.add('open'); 
             }, 1000); 
 
-            // Après la durée de l'animation (~2s) + un délai de visualisation (1s) = 3s de délai total
             setTimeout(() => {
-                // 1. Rendre le contenu principal visible (Fondu enchaîné)
                 mainContent.classList.remove('hidden-content');
                 mainContent.classList.add('visible-content');
-                
-                // 2. Faire disparaître la couverture animée
                 bookContainer.classList.add('hide'); 
-
-                // 3. Démarrer le carousel après l'ouverture
                 startCarousel();
             }, 3000); 
 
-            // Déblocage de la musique au premier clic
             document.body.addEventListener('click', () => {
                 if (music.muted) {
                     music.muted = false;
@@ -407,29 +467,29 @@
         });
 
 
-        // LOGIQUE DU CAROUSEL (inchangée)
+        // LOGIQUE DU CAROUSEL (Optimisée)
         function startCarousel() {
             if (!carousel) return;
-            const slideWidth = 100 / (totalImages + 1); 
+            // On calcule la largeur pour gérer 8 images. Chaque image prend 100% de la vue.
+            const totalWidth = 100 * totalImages; 
+            carousel.style.width = `${totalWidth}%`; // Ajuste la largeur totale du conteneur
             
             setInterval(() => {
                 currentIndex++;
-                const offset = -currentIndex * slideWidth;
+                if (currentIndex >= totalImages) {
+                    currentIndex = 0; // Retour à la première image pour un défilement continu
+                }
+
+                // Décalage en pourcentage (ex: 0%, -12.5%, -25%, etc. pour 8 images)
+                const offset = -currentIndex * (100 / totalImages); 
+                
                 carousel.style.transition = `transform ${transitionDuration / 1000}s cubic-bezier(0.42, 0, 0.58, 1)`;
                 carousel.style.transform = `translateX(${offset}%)`;
-
-                if (currentIndex >= totalImages) {
-                    setTimeout(() => {
-                        carousel.style.transition = 'none';
-                        currentIndex = 0;
-                        carousel.style.transform = 'translateX(0)';
-                    }, transitionDuration); 
-                }
+                
             }, 5000); 
         }
 
-
-        // LOGIQUE DU FORMULAIRE ET CONFETTIS (inchangée)
+        // LOGIQUE DU FORMULAIRE ET CONFETTIS (Conservée)
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
