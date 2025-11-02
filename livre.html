@@ -11,7 +11,7 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@300;400;700&family=Sacramento&display=swap" rel="stylesheet">
 
-  <!-- Firebase SDK (corrigé) -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
@@ -306,14 +306,14 @@
       apiKey: "AIzaSyDT_tJG17ox5JChrj8Khw_yltdpaJxeJc4",
       authDomain: "abbepatrick-fe5db.firebaseapp.com",
       projectId: "abbepatrick-fe5db",
-      storageBucket: "abbepatrick-fe5db.firebasestorage.app",
+      storageBucket: "abbepatrick-fe5db.appspot.com",
       messagingSenderId: "564527267199",
       appId: "1:564527267199:web:1645bd144ef9f4c0386e4a"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const collectionPath = "artifacts/abbepatrick-fe5db/public/data/testimonials";
+    const collectionPath = "messages"; // ✅ corrigé
 
     const container = document.getElementById("testimonialsContainer");
     const countValue = document.getElementById("countValue");
@@ -386,6 +386,10 @@
         document.getElementById("sortByPopularity").classList.add("active");
         document.getElementById("sortByDate").classList.remove("active");
         loadTestimonials("popularity");
+      });
+
+      document.getElementById("printButton").addEventListener("click", () => {
+        window.print();
       });
     });
   </script>
