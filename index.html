@@ -132,7 +132,7 @@
         .book.open .page { transform: rotateY(-175deg); transition-delay: 0.1s; }
         /* --- FIN STYLES LIVRE D'OR --- */
 
-        /* --- STYLES CAROUSEL AMÉLIORÉS --- */
+        /* --- STYLES CAROUSEL AMÉLIORÉS (Cadrage Corrigé) --- */
         .hero {
             position: relative;
             height: 60vh; /* Hauteur de la zone visible */
@@ -144,18 +144,18 @@
         .carousel {
             display: flex;
             height: 100%;
-            width: 100%; /* Sera ajusté par JS */
+            width: 100%; 
             transition: transform 1s cubic-bezier(0.42, 0, 0.58, 1);
         }
         .carousel-item {
-            flex-shrink: 0; /* Empêche le redimensionnement */
+            flex-shrink: 0; 
             width: 100%; 
             height: 100%;
         }
         .hero-img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Assure que l'image couvre bien l'espace */
+            object-fit: cover; /* **Correction du Cadrage** */
             display: block;
         }
         .hero-text {
@@ -169,7 +169,7 @@
             justify-content: center;
             align-items: center;
             color: white;
-            background: rgba(0, 0, 0, 0.5); /* Ombre semi-transparente pour la lisibilité */
+            background: rgba(0, 0, 0, 0.5); 
             padding: 20px;
             text-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
         }
@@ -272,8 +272,79 @@
             color: theme('colors.accent-gold'); 
             margin-right: 10px;
         }
-        /* Styles de formulaire et modal (Conservés, supposés être définis ailleurs ou dans Tailwind) */
+        
+        /* --- STYLES MODAL DE CONFIRMATION (Ajoutés pour corriger l'affichage) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            z-index: 10000;
+        }
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 40px 30px;
+            border-radius: 10px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: translateY(-50px);
+            transition: transform 0.3s ease-in-out;
+            border-top: 5px solid var(--primary-color);
+        }
+        .modal-overlay.open .modal-content {
+            transform: translateY(0);
+        }
+        .modal-button-link {
+            background: linear-gradient(135deg, var(--primary-color), #0047AB);
+            @apply inline-flex items-center justify-center 
+                   px-8 py-3 mt-6 
+                   text-lg font-extrabold text-white 
+                   rounded-full transition-all duration-300 ease-out;
+            box-shadow: 0 5px 15px rgba(0, 45, 98, 0.4); 
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            width: 100%;
+        }
 
+        /* --- STYLES FORMULAIRE CORRIGÉS (Ceci corrige les champs d'écriture) --- */
+        #testimonialForm label {
+            @apply block text-lg text-primary-navy font-bold text-left mt-5 mb-2;
+        }
+
+        #testimonialForm input[type="text"], 
+        #testimonialForm textarea {
+            @apply w-full p-4 border-2 rounded-lg 
+                   focus:ring-4 focus:ring-accent-gold 
+                   transition-all duration-300 shadow-sm
+                   font-serif text-lg; 
+            border-color: #ddd;
+            box-sizing: border-box;
+        }
+
+        #testimonialForm textarea {
+            resize: vertical;
+        }
+
+        #testimonialForm button[type="submit"] {
+            background: linear-gradient(135deg, var(--primary-color), #0047AB);
+            @apply action-button inline-flex items-center justify-center 
+                   px-10 py-4 mt-8 
+                   text-xl font-extrabold text-white
+                   rounded-full transition-all duration-300 ease-out;
+            box-shadow: 0 8px 20px rgba(0, 45, 98, 0.5); 
+            width: 100%; 
+        }
     </style>
 </head>
 
@@ -305,8 +376,10 @@
                     <div class="carousel-item"><img src="photo1.jpeg" alt="Abbé Patrick Muswankeng - Photo 1" class="hero-img"></div>
                     <div class="carousel-item"><img src="paroisse_anuarite.jpeg" alt="Paroisse Bienheureuse Anuarite" class="hero-img"></div>
                     <div class="carousel-item"><img src="photo2.jpeg" alt="Abbé Patrick Muswankeng - Photo 2" class="hero-img"></div>
-                    <div class="carousel-item"><img src="photo3.jpeg" alt="Abbé Patrick Muswankeng - Photo 3" class="hero-img"></div> <div class="carousel-item"><img src="photo4.jpeg" alt="Abbé Patrick Muswankeng - Photo 4" class="hero-img"></div>
-                    <div class="carousel-item"><img src="photo5.jpeg" alt="Abbé Patrick Muswankeng - Photo 5" class="hero-img"></div> <div class="carousel-item"><img src="photo6.jpeg" alt="Abbé Patrick Muswankeng - Photo 6" class="hero-img"></div>
+                    <div class="carousel-item"><img src="photo3.jpeg" alt="Abbé Patrick Muswankeng - Photo 3" class="hero-img"></div> 
+                    <div class="carousel-item"><img src="photo4.jpeg" alt="Abbé Patrick Muswankeng - Photo 4" class="hero-img"></div>
+                    <div class="carousel-item"><img src="photo5.jpeg" alt="Abbé Patrick Muswankeng - Photo 5" class="hero-img"></div> 
+                    <div class="carousel-item"><img src="photo6.jpeg" alt="Abbé Patrick Muswankeng - Photo 6" class="hero-img"></div>
                     <div class="carousel-item"><img src="photo7.jpeg" alt="Abbé Patrick Muswankeng - Photo 7" class="hero-img"></div>
                 </div>
                 
@@ -325,19 +398,19 @@
 
             <div class="w-24 h-1 mx-auto mb-16 rounded-full bg-accent-gold/50"></div>
             
-            <form id="testimonialForm">
+            <form id="testimonialForm" class="max-w-xl mx-auto w-full p-6 bg-white shadow-xl rounded-lg border-t-4 border-primary-navy">
                 <label for="name">Votre Nom, Prénom et Qualité :</label>
                 <input type="text" id="name" placeholder="Ex : Gamaliel Kalambo - Paroissiens de Anuarite" required aria-label="Votre nom, prénom et qualité" />
                 
                 <label for="message">Votre message de gratitude, souvenir ou prière :</label>
                 <textarea id="message" rows="6" placeholder="Ex : Cher Abbé Patrick, merci pour la profondeur de vos homélies et votre accompagnement pastoral..." required aria-label="Votre message"></textarea>
                 
-                <div id="errorMessage" class="text-red-600 text-lg mb-4 text-center font-bold" role="alert" style="display: none;"></div>
+                <div id="errorMessage" class="text-red-600 text-lg mb-4 text-center font-bold mt-4" role="alert" style="display: none;"></div>
 
                 <button type="submit">✨ Envoyer mon Messsage</button>
             </form>
 
-            <div>
+            <div class="text-center">
                 <a href="livre.html" class="book-button">
                     <svg class="w-8 h-8 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.5l8 4.5v8l-8 4.5-8-4.5v-8l8-4.5zM12 6.5v11.5M4 11l8 4.5 8-4.5M4 11v8M20 11v8"></path></svg>
                     ACCEDER AU LIVRE ET VOIR LES DIFFERENTS MESSAGES
@@ -379,7 +452,7 @@
     
     <div id="successModal" class="modal-overlay">
         <div class="modal-content">
-            <svg class="mx-auto w-20 h-20 text-primary-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <svg class="mx-auto w-20 h-20 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <h2 class="text-3xl font-display text-gray-800 mt-4 mb-3 font-bold">Message Soumis, merci ! 🙏</h2>
             <p class="text-gray-600 font-serif">Votre message de soutien est bien enregistré. Merci pour votre contribution au Livre d'Or de l'Abbé.</p>
             
@@ -394,7 +467,7 @@
     </div>
 
     <script>
-        // ... (Configuration Firebase et fonctions Modal inchangées) ...
+        // Configuration Firebase (Identique)
         const firebaseConfig = {
             apiKey: "AIzaSyDT_tJG17ox5JChrj8Khw_yltdpaJxeJc4",
             authDomain: "abbepatrick-fe5db.firebaseapp.com",
@@ -428,11 +501,18 @@
         let currentIndex = 0;
         const transitionDuration = 1000;
         const music = document.getElementById('backgroundMusic');
+        const submitButton = form.querySelector('button[type="submit"]'); // Référence au bouton de soumission
+        const errorMessage = document.getElementById('errorMessage');
 
         function openModal(id) {
             const modal = document.getElementById(id);
             modal.classList.add('open');
-            modal.querySelector('a, button').focus();
+            // Gérer le focus sur le bouton d'accès au livre d'or
+            const accessLink = modal.querySelector('.modal-button-link');
+            if (accessLink) accessLink.focus();
+            
+            // S'assurer que le scroll est au top pour une meilleure expérience modale
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         function closeModal(id) {
             document.getElementById(id).classList.remove('open');
@@ -467,20 +547,18 @@
         });
 
 
-        // LOGIQUE DU CAROUSEL (Optimisée)
+        // LOGIQUE DU CAROUSEL (Conservée/Optimisée)
         function startCarousel() {
             if (!carousel) return;
-            // On calcule la largeur pour gérer 8 images. Chaque image prend 100% de la vue.
             const totalWidth = 100 * totalImages; 
-            carousel.style.width = `${totalWidth}%`; // Ajuste la largeur totale du conteneur
+            carousel.style.width = `${totalWidth}%`; 
             
             setInterval(() => {
                 currentIndex++;
                 if (currentIndex >= totalImages) {
-                    currentIndex = 0; // Retour à la première image pour un défilement continu
+                    currentIndex = 0; 
                 }
 
-                // Décalage en pourcentage (ex: 0%, -12.5%, -25%, etc. pour 8 images)
                 const offset = -currentIndex * (100 / totalImages); 
                 
                 carousel.style.transition = `transform ${transitionDuration / 1000}s cubic-bezier(0.42, 0, 0.58, 1)`;
@@ -489,11 +567,10 @@
             }, 5000); 
         }
 
-        // LOGIQUE DU FORMULAIRE ET CONFETTIS (Conservée)
+        // LOGIQUE DU FORMULAIRE ET CONFETTIS
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const errorMessage = document.getElementById('errorMessage');
             errorMessage.style.display = 'none';
             closeModal('successModal');
 
@@ -505,8 +582,6 @@
                 errorMessage.style.display = 'block';
                 return;
             }
-
-            const submitButton = form.querySelector('button[type="submit"]');
 
             if (!db) {
                 errorMessage.textContent = `❌ Échec: Le service d'envoi est indisponible. Veuillez vérifier la configuration de Firebase.`;
@@ -524,11 +599,13 @@
                     name: name,
                     message: message,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    dateAdded: new Date().toISOString(),
+                    // Initialiser les champs pour le tri (important pour livre.html)
+                    reactions: { heart: 0, blessing: 0, star: 0 },
+                    totalReactions: 0, 
                     event: "Hommage Abbé Patrick Muswankeng"
                 });
 
-                // Succès : Confettis (Bleu, Or, Blanc)
+                // Succès : Confettis et Modal
                 form.reset();
                 confetti({
                     particleCount: 150,
@@ -544,7 +621,7 @@
                 errorMessage.style.display = 'block';
             } finally {
                 submitButton.disabled = false;
-                submitButton.textContent = "✨ Soumettre mon Témoignage";
+                submitButton.textContent = "✨ Envoyer mon Messsage";
             }
         });
     </script>
